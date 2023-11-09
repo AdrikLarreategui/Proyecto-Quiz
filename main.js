@@ -9,23 +9,40 @@ const btn4Container = document.querySelector('#btn4')
 const nextBtnContainer = document.querySelector('#nextBtn')
 const resultsContainer = document.querySelector('#results')
 const resultBtnContainer = document.querySelector('#resultButton')
-
 let questionCont = 9 //cuando esté construído el sistema de llamada a API iniciar a 0
-let correctCont = 0
+let correctCont = 0, questionsArray = []
+
+async function getQuestionsList(){
+  await axios.get('https://opentdb.com/api.php?amount=10') //una vez tengamos el token, cambiar url por https://opentdb.com/api.php?amount=10&token=YOURTOKENHERE
+  .then((resul)=>{
+    questionsArray = resul.data.results
+    console.log(questionsArray, resul.data.response_code);
+  })
+  .catch((error)=>{
+    // si resul.data.response_code es 4 hay que resetear el token y volver a llamar a la función
+    if(error.data.response_code === 4){
+      axios.get('https://opentdb.com/api_token.php?command=reset&token=YOURTOKENHERE')
+      getQuestionsList()
+    }
+  })
+}
+
 
 startBtn.addEventListener('click', ()=>{
+  getQuestionsList()
   homeContainer.classList.add('hide')
   questionContainer.classList.remove('hide')
 })
 
 function nextQuestion(){
+  // questionCont++
 
 }
 
 nextBtnContainer.addEventListener('click', ()=>{
-  if(cont < 9){
+  if(questionCont < 9){
     nextQuestion()
-  } else if (cont === 9) {
+  } else if (questionCont === 9) {
     questionContainer.classList.add('hide')
     resultsContainer.classList.remove('hide')
   }
