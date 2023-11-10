@@ -65,6 +65,7 @@ startBtn.addEventListener('click', ()=>{
   setTimeout(startQuiz, 500)
 })
 
+
 function nextQuestion(){
   // questionCont++
 
@@ -76,6 +77,8 @@ nextBtnContainer.addEventListener('click', ()=>{
   } else if (questionCont === 9) {
     questionContainer.classList.add('hide')
     resultsContainer.classList.remove('hide')
+    btn1Container.classList.remove('correctColor')
+    btn1Container.classList.remove('incorrectColor')
   }
 })
 
@@ -83,4 +86,12 @@ resultBtnContainer.addEventListener('click', ()=>{
   resultsContainer.classList.add('hide')
   homeContainer.classList.remove('hide')
   // questionCont = 0 cuando esté construído el sistema de llamada a API descomentar para que se reinicie el contador de preguntas al iniciar nuevo juego
+})
+
+btn1Container.addEventListener('click', () => {
+  if (questionsArray[0].correct_answer === btn1Container.textContent) {
+    btn1Container.classList.add('correctColor')
+  } else {
+    btn1Container.classList.add('incorrectColor')
+  }
 })
