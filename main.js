@@ -1,96 +1,102 @@
-const startBtn = document.querySelector('#startButton')
-const homeContainer = document.querySelector('#home')
+const apiUrl = 'https://opentdb.com/api.php?amount=10&type=multiple';
+const questionElement = document.getElementById('questionStart');
+const optionsElements = document.querySelectorAll('#options li');
+const resultElement = document.getElementById('result');
+const nextButton = document.getElementById('next-button');
+const startBtn = document.getElementById('startButton')
+const homeContainer = document.getElementById('home')
 const questionContainer = document.querySelector('#question')
-const quizQuestionContainer = document.querySelector('#quizQuestion')
-const btn1Container = document.querySelector('#btn1')
-const btn2Container = document.querySelector('#btn2')
-const btn3Container = document.querySelector('#btn3')
-const btn4Container = document.querySelector('#btn4')
-const nextBtnContainer = document.querySelector('#nextBtn')
 const resultsContainer = document.querySelector('#results')
-const resultBtnContainer = document.querySelector('#resultButton')
-let questionCont = 9 //cuando esté construído el sistema de llamada a API iniciar a 0
-let correctCont = 0, questionsArray = [], randomAnswer
+const score = document.getElementById('textoPersonalizado')
+const imageScore = document.querySelector('#notaFinal')
 
+let currentQuestionIndex = 0;
+let correctAnswers = 0;
+let questions = [];
 
-async function getQuestionsList(){
-  await axios.get('https://opentdb.com/api.php?amount=10&type=multiple') //una vez tengamos el token, cambiar url por https://opentdb.com/api.php?amount=10&token=YOURTOKENHERE
-  .then((resul)=>{
-    questionsArray = resul.data.results
-    console.log(questionsArray, resul.data.response_code);
-  })
-  .catch((error)=>{
-    console.log(error.data.response_code)
-    // si resul.data.response_code es 4 hay que resetear el token y volver a llamar a la función
-    if(error.data.response_code === 4){
-      axios.get('https://opentdb.com/api_token.php?command=reset&token=YOURTOKENHERE')
-      getQuestionsList()
+// Cargar preguntas desde la API
+async function loadQuestions() {
+    try {
+        const data = await axios.get(apiUrl);
+        questions = data.data.results;
+        displayQuestion(currentQuestionIndex);
+    } catch (error) {
+        console.error('Error al cargar preguntas desde la API:', error);
     }
-  })
-}
-function eraseArray (randomAnswer, optionsArray) {
-  optionsArray.splice(randomAnswer, 1)
 }
 
-function randomNumber (optionsArray) {
-  randomAnswer = Math.floor(Math.random()*(optionsArray.length-1))
-  return randomAnswer
+// Mostrar una pregunta en la pantalla
+function displayQuestion(index) {
+    if (index < questions.length) {
+        const question = questions[index];
+        questionElement.innerText = question.question;
+        const options = question.incorrect_answers.slice();
+        options.push(question.correct_answer);
+        shuffleArray(options);
+        optionsElements.forEach((option, i) => {
+            option.innerText = options[i];
+            option.addEventListener('click', checkAnswer);
+        });
+        resultElement.innerText = '';
+    } else {
+        // Fin del cuestionario
+        imageScore.src = `images/${correctAnswers}-10.jpg`
+        questionContainer.classList.add('hide')
+        resultsContainer.classList.remove('hide')
+        score.innerText = `Respuestas correctas: ${correctAnswers} de 10`;
+        nextButton.style.display = 'none';
+      
+    }
 }
 
-function startQuiz () {
-  let options = questionsArray[0].incorrect_answers
-  options.push(questionsArray[0].correct_answer)
-  randomAnswer = randomNumber(options)
-  console.log(randomAnswer, 'hola')
-  quizQuestionContainer.innerText = decodeURIComponent(questionsArray[0].question)
-  btn1Container.innerText = decodeURIComponent(options[randomAnswer])
-  eraseArray(randomAnswer, options)
-  randomAnswer = randomNumber(options)
-  btn2Container.innerText = decodeURIComponent(options[randomAnswer])
-  eraseArray(randomAnswer, options)
-  randomAnswer = randomNumber(options)
-  btn3Container.innerText = decodeURIComponent(options[randomAnswer])
-  eraseArray(randomAnswer, options)
-  randomAnswer = randomNumber(options)
-  btn4Container.innerText = decodeURIComponent(options[randomAnswer])
-  eraseArray(randomAnswer, options)
-  randomAnswer = randomNumber(options)
+// Comprobar si la respuesta seleccionada es correcta
+function checkAnswer(event) {
+    const selectedOption = event.target.innerText;
+    const currentQuestion = questions[currentQuestionIndex];
+    if (selectedOption === currentQuestion.correct_answer) {
+        resultElement.classList.add('alert-success')
+        resultElement.innerText = 'Respuesta correcta';
+        correctAnswers++;
+        resultElement.classList.remove('hide')
+        setTimeout(() => {
+            resultElement.classList.add('hide')
+            resultElement.classList.remove('alert-success')
+            resultElement.innerText = ''
+        }, 3000) 
+    } else {
+        resultElement.classList.add('alert-danger')
+        resultElement.innerText = 'Respuesta incorrecta'; 
+        resultElement.classList.remove('hide')
+        setTimeout(() => {
+            resultElement.classList.add('hide')
+            resultElement.classList.remove('alert-danger')
+            resultElement.innerText = ''
+        }, 3000) 
+    }
+    optionsElements.forEach((option) => option.removeEventListener('click', checkAnswer));
+    nextButton.style.display = 'block';
 }
 
+// Barajar aleatoriamente un array
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+// Manejar el botón "Siguiente"
+nextButton.addEventListener('click', () => {
+    console.log(currentQuestionIndex)
+    currentQuestionIndex++;
+    displayQuestion(currentQuestionIndex);
+});
+
+// Iniciar el cuestionario
 startBtn.addEventListener('click', ()=>{
-  getQuestionsList()
-  homeContainer.classList.add('hide')
-  questionContainer.classList.remove('hide')
-  setTimeout(startQuiz, 500)
-})
+    loadQuestions()
+    homeContainer.classList.add('hide')
+    questionContainer.classList.remove('hide')
+  })
 
 
-function nextQuestion(){
-  // questionCont++
-
-}
-
-nextBtnContainer.addEventListener('click', ()=>{
-  if(questionCont < 9){
-    nextQuestion()
-  } else if (questionCont === 9) {
-    questionContainer.classList.add('hide')
-    resultsContainer.classList.remove('hide')
-    btn1Container.classList.remove('correctColor')
-    btn1Container.classList.remove('incorrectColor')
-  }
-})
-
-resultBtnContainer.addEventListener('click', ()=>{
-  resultsContainer.classList.add('hide')
-  homeContainer.classList.remove('hide')
-  // questionCont = 0 cuando esté construído el sistema de llamada a API descomentar para que se reinicie el contador de preguntas al iniciar nuevo juego
-})
-
-btn1Container.addEventListener('click', () => {
-  if (questionsArray[0].correct_answer === btn1Container.textContent) {
-    btn1Container.classList.add('correctColor')
-  } else {
-    btn1Container.classList.add('incorrectColor')
-  }
-})

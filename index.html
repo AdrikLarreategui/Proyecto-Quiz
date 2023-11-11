@@ -1,115 +1,111 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Quiz</title>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz App</title>
+    <link rel="stylesheet" href="bootstrap.min.css">
     <script src="https://unpkg.com/axios/dist/axios.min.js" defer></script>
     <script src="main.js" defer></script>
-    <link rel="stylesheet" href="bootstrap.min.css" />
-
     <style>
-      .hide {
-        display: none;
-      }
-      .correctColor  {
-        background-color: green;
-      }
-      .incorrectColor {
-        background-color: red;
-      }
-    </style>
-  </head>
-  <body>
+        .hide {
+          display: none;
+        }
+        .noList {
+            list-style-type: none
+        }
+      </style>
+</head>
+<body>
     <nav class="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
-      <div class="container-fluid">
-        <span class="navbar-brand mx-5 fs-2 fw-bold">Quiz</span>
-      </div>
+        <div class="container-fluid">
+          <span class="navbar-brand mx-5 fs-2 fw-bold">Quiz</span>
+        </div>
     </nav>
     <div id="home">
-      <div class="d-flex justify-content-center m-5">
-        <div class="card bg-light mb-3" style="max-width: 20rem">
-          <div class="card-header">Bienvenido</div>
-          <div class="card-body d-flex justify-content-center">
-            <button type="button" id="startButton" class="btn btn-primary m-5">
-              Empieza el juego
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div id="question" class="hide">
-      <div class="card bg-light mb-3 m-5">
-        <div id="quizQuestion" class="card-header">
-        </div>
-        <div class="card-body">
-          <div class="d-flex justify-content-evenly m-5">
-            <button
-              id="btn1"
-              type="button"
-              class="btn btn-primary btn-lg"
-              style="min-width: 10%">
-              1
-            </button>
-            <button
-              id="btn2"
-              type="button"
-              class="btn btn-primary btn-lg"
-              style="min-width: 10%">
-              2
-            </button>
-          </div>
-          <div class="d-flex justify-content-evenly m-5">
-            <button
-              id="btn3"
-              type="button"
-              class="btn btn-primary btn-lg"
-              style="min-width: 10%">
-              3
-            </button>
-            <button
-              id="btn4"
-              type="button"
-              class="btn btn-primary btn-lg"
-              style="min-width: 10%">
-              4
-            </button>
-          </div>
-        </div>
-        <div class="cardFooter d-flex justify-content-end mx-5 mb-2">
-          <button type="button" id="nextBtn" class="btn btn-primary btn-sm">
-            Siguiente
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <div id="results" class="hide">
-      <div class="d-flex justify-content-evenly m-5">
-        <div class="card bg-light mb-3 mx-5 d-flex flex-row">
-          <div id="notaFinal">
-            <img src="images/10-10.jpg" class="rounded" />
-            <!-- pendiente de 'imagen' del resultado obtenido X/10 en la variable correctCont -->
-          </div>
-          <div
-            id="textoResultado"
-            class="d-flex flex-column justify-content-center align-items-center mx-5">
-            <h4>Aquí van tus resultados</h4>
-            <div id="textoPersonalizado">
-              <p>Sobresaliente!</p>
-            </div>
-            <div class="cardFooter d-flex justify-content-center mx-5 mb-2">
-              <button
-                type="button"
-                class="btn btn-primary btn-sm"
-                id="resultButton">
-                Volver a jugar
+        <div class="d-flex justify-content-center m-5">
+          <div class="card bg-light mb-3" style="max-width: 20rem">
+            <div class="card-header">Bienvenido</div>
+            <div class="card-body d-flex justify-content-center">
+              <button type="button" id="startButton" class="btn btn-primary m-5">
+                Empieza el juego
               </button>
             </div>
           </div>
         </div>
       </div>
+    
+      <div id="question" class="quiz-container hide">
+        <div class="card bg-light mb-3 m-5 question-container">
+          <div class="card-header">
+            <h4 id="questionStart"></h4>
+          </div>
+          <div class="card-body">
+            <div class="d-flex justify-content-evenly m-5">
+                <ul class = "noList" id="options">
+                    <button
+                    type="button"
+                    class="btn btn-primary btn-lg"
+                    style="min-width: 10%">
+                    <li id="option1"></li></button>
+
+                    <button
+                    type="button"
+                    class="btn btn-primary btn-lg"
+                    style="min-width: 10%">
+                    <li id="option2"></li></button>
+
+                    <button
+                    type="button"
+                    class="btn btn-primary btn-lg"
+                    style="min-width: 10%">
+                    <li id="option3"></li></button>
+
+                    <button
+                    type="button"
+                    class="btn btn-primary btn-lg"
+                    style="min-width: 10%">
+                    <li id="option4"></li></button>
+                </ul> 
+            </div>
+          </div>
+          <div class="d-flex justify-content-center">
+            <div id="result" class="alert hide w-25 d-flex justify-content-center" role="alert">
+            </div>
+          </div>
+          <div class="cardFooter d-flex justify-content-end mx-5 mb-2">
+            <button type="button" id="next-button" class="btn btn-primary btn-sm">
+              Siguiente
+            </button>
+          </div>
+        </div>
+      </div>
+   
     </div>
-  </body>
+    <div id="results" class="hide">
+        <div class="d-flex justify-content-evenly m-5">
+          <div class="card bg-light mb-3 mx-5 d-flex flex-row">
+            <div >
+              <img id="notaFinal" src="" class="rounded" />
+            </div>
+            <div
+              id="textoResultado"
+              class="d-flex flex-column justify-content-center align-items-center mx-5">
+              <h4>Aquí van tus resultados</h4>
+              <div>
+                <p id="textoPersonalizado"></p>
+              </div>
+              <div class="cardFooter d-flex justify-content-center mx-5 mb-2">
+                <button
+                  type="button"
+                  class="btn btn-primary btn-sm"
+                  id="resultButton">
+                  Volver a jugar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+</body>
 </html>
