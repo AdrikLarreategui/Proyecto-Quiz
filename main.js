@@ -19,7 +19,7 @@ async function getQuestionsList(){
     console.log(questionsArray, resul.data.response_code);
   })
   .catch((error)=>{
-    // si resul.data.response_code es 4 hay que resetear el token y volver a llamar a la función
+    // si error.data.response_code es 4 hay que resetear el token y volver a llamar a la función
     if(error.data.response_code === 4){
       axios.get('https://opentdb.com/api_token.php?command=reset&token=YOURTOKENHERE')
       getQuestionsList()
