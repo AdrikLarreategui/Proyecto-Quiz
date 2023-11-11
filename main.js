@@ -1,4 +1,4 @@
-const apiUrl = 'https://opentdb.com/api.php?amount=10&type=multiple';
+const apiUrl = 'https://opentdb.com/api.php?amount=3&type=multiple';
 const questionElement = document.getElementById('questionStart');
 const optionsElements = document.querySelectorAll('#options li');
 const resultElement = document.getElementById('result');
@@ -9,6 +9,7 @@ const questionContainer = document.querySelector('#question')
 const resultsContainer = document.querySelector('#results')
 const score = document.getElementById('textoPersonalizado')
 const imageScore = document.querySelector('#notaFinal')
+const tryAgainBtn = document.querySelector('#resultButton')
 
 let currentQuestionIndex = 0;
 let correctAnswers = 0;
@@ -99,4 +100,12 @@ startBtn.addEventListener('click', ()=>{
     questionContainer.classList.remove('hide')
   })
 
-
+// reiniciar el juego
+tryAgainBtn.addEventListener('click', ()=> {
+  currentQuestionIndex = 0;
+  correctAnswers = 0;
+  questions = [];
+  loadQuestions()
+  resultsContainer.classList.add('hide')
+  homeContainer.classList.remove('hide')
+})
