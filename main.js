@@ -14,7 +14,7 @@ let correctCont = 0, questionsArray = [], randomAnswer
 
 
 async function getQuestionsList(){
-  await axios.get('https://opentdb.com/api.php?amount=10') //una vez tengamos el token, cambiar url por https://opentdb.com/api.php?amount=10&token=YOURTOKENHERE
+  await axios.get('https://opentdb.com/api.php?amount=10&type=multiple') //una vez tengamos el token, cambiar url por https://opentdb.com/api.php?amount=10&token=YOURTOKENHERE
   .then((resul)=>{
     questionsArray = resul.data.results
     console.log(questionsArray, resul.data.response_code);
@@ -28,7 +28,6 @@ async function getQuestionsList(){
     }
   })
 }
-
 function eraseArray (randomAnswer, optionsArray) {
   optionsArray.splice(randomAnswer, 1)
 }
