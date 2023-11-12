@@ -11,6 +11,7 @@
         .hide {
           display: none;
         }
+
         .noList {
             list-style-type: none
         }
@@ -22,14 +23,21 @@
           <span class="navbar-brand mx-5 fs-2 fw-bold">Quiz</span>
         </div>
     </nav>
-    <div id="home">
+    <div id="home" class="d-flex justify-content-center">
         <div class="d-flex justify-content-center m-5">
-          <div class="card bg-light mb-3" style="max-width: 20rem">
+          <div id ="initCard" class="card bg-light mb-3" style="max-width: 20rem">
             <div class="card-header">Bienvenido</div>
             <div class="card-body d-flex justify-content-center">
-              <button type="button" id="startButton" class="btn btn-primary m-5">
+              <button type="button" id="startButton" class="btn btn-primary m-5" style="height: 2.5rem">
                 Empieza el juego
               </button>
+            </div>
+          </div>
+        </div>
+        <div class="d-flex justify-content-center m-5">
+          <div class="card bg-light mb-3" style="max-width: 20rem">
+            <div class="card-header">Your stats</div>
+            <div id="paintStats" class="card-body d-flex flex-column justify-content-center">
             </div>
           </div>
         </div>
@@ -74,7 +82,7 @@
             </div>
           </div>
           <div class="cardFooter d-flex justify-content-end mx-5 mb-2">
-            <button type="button" id="next-button" class="btn btn-primary btn-sm">
+            <button type="button" id="next-button" class="btn btn-primary btn-sm disabled">
               Siguiente
             </button>
           </div>

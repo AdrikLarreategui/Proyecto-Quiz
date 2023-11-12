@@ -10,10 +10,12 @@ const resultsContainer = document.querySelector('#results')
 const score = document.getElementById('textoPersonalizado')
 const imageScore = document.querySelector('#notaFinal')
 const tryAgainBtn = document.querySelector('#resultButton')
+const statsPaint = document.querySelector('#paintStats')
+const init = document.querySelector('#initCard')
 
 let currentQuestionIndex = 0;
 let correctAnswers = 0;
-let questions = [];
+let questions = [], stats = []
 
 // Cargar preguntas desde la API
 async function loadQuestions() {
@@ -25,6 +27,23 @@ async function loadQuestions() {
         console.error('Error al cargar preguntas desde la API:', error);
     }
 }
+
+async function statsFunction(){
+  try {
+    let request = ''
+    stats = JSON.parse(localStorage.getItem('yourStats'))
+    for(let i = 0; i < stats.length; i++){
+      request += `<p>Data: <span class="text-black-50"><b>${stats[i].answersData}</b></span>   //    
+                  Correct answers: <span class="text-black-50"><b>${stats[i].correctAnswers}</b></span></p>`
+    }
+
+    statsPaint.innerHTML = request
+  } catch (error) {
+    console.error(error.message);
+  }
+}
+
+statsFunction()
 
 // Mostrar una pregunta en la pantalla
 function displayQuestion(index) {
@@ -46,7 +65,28 @@ function displayQuestion(index) {
         resultsContainer.classList.remove('hide')
         score.innerText = `Respuestas correctas: ${correctAnswers} de 10`;
         nextButton.style.display = 'none';
-      
+
+        const date = new Date();
+        // console.log(date.getMonth()); //comprobar valor devuelto, aparece un 10 cuando debe ser 11 
+        const answersData = `${date.getDate()}/${date.getMonth()+1}/${date.getFullYear()}`
+        console.log(stats);
+        if(stats != null){
+          stats.push({
+            answersData : answersData,
+            correctAnswers : correctAnswers
+          })
+        } else {
+          stats = [{
+            answersData : answersData,
+            correctAnswers : correctAnswers
+          }]
+        }
+        console.log(stats);
+        localStorage.setItem('yourStats', JSON.stringify(stats))
+        currentQuestionIndex = 0
+        correctAnswers = 0
+        init.classList.add('hide')
+        statsFunction()
     }
 }
 
@@ -63,6 +103,7 @@ function checkAnswer(event) {
             resultElement.classList.add('hide')
             resultElement.classList.remove('alert-success')
             resultElement.innerText = ''
+            nextButton.classList.remove('disabled')
         }, 3000) 
     } else {
         resultElement.classList.add('alert-danger')
@@ -72,10 +113,12 @@ function checkAnswer(event) {
             resultElement.classList.add('hide')
             resultElement.classList.remove('alert-danger')
             resultElement.innerText = ''
+            nextButton.classList.remove('disabled')
         }, 3000) 
     }
     optionsElements.forEach((option) => option.removeEventListener('click', checkAnswer));
     nextButton.style.display = 'block';
+    
 }
 
 // Barajar aleatoriamente un array
@@ -88,8 +131,8 @@ function shuffleArray(array) {
 
 // Manejar el botón "Siguiente"
 nextButton.addEventListener('click', () => {
-    console.log(currentQuestionIndex)
     currentQuestionIndex++;
+    nextButton.classList.add('disabled')
     displayQuestion(currentQuestionIndex);
 });
 
@@ -108,4 +151,5 @@ tryAgainBtn.addEventListener('click', ()=> {
   loadQuestions()
   resultsContainer.classList.add('hide')
   homeContainer.classList.remove('hide')
+  init.classList.remove('hide')
 })
