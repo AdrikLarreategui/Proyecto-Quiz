@@ -1,4 +1,4 @@
-const apiUrl = 'https://opentdb.com/api.php?amount=3&type=multiple';
+const apiUrl = 'https://opentdb.com/api.php?amount=10&type=multiple';
 const questionElement = document.getElementById('questionStart');
 const optionsElements = document.querySelectorAll('#options li');
 const resultElement = document.getElementById('result');
@@ -12,10 +12,12 @@ const imageScore = document.querySelector('#notaFinal')
 const tryAgainBtn = document.querySelector('#resultButton')
 const statsPaint = document.querySelector('#paintStats')
 const init = document.querySelector('#initCard')
+const yourStats = document.querySelector('#stats')
+const yourChart = document.getElementById('chart')
 
 let currentQuestionIndex = 0;
 let correctAnswers = 0;
-let questions = [], stats = []
+let questions = [], stats = [], chart
 
 // Cargar preguntas desde la API
 async function loadQuestions() {
@@ -30,14 +32,43 @@ async function loadQuestions() {
 
 async function statsFunction(){
   try {
-    let request = ''
+    let request = '', statsArray = [], datesArray = []
     stats = JSON.parse(localStorage.getItem('yourStats'))
     for(let i = 0; i < stats.length; i++){
-      request += `<p>Data: <span class="text-black-50"><b>${stats[i].answersData}</b></span>   //    
-                  Correct answers: <span class="text-black-50"><b>${stats[i].correctAnswers}</b></span></p>`
+      request += `<span>Data: <span class="text-black-50"><b>${stats[i].answersData}</b></span>   //    
+                  Correct answers: <span class="text-black-50"><b>${stats[i].correctAnswers}</b></span></span>`
     }
 
     statsPaint.innerHTML = request
+
+    for(i = 0; i < stats.length; i++){
+      if (statsArray.length === 0) {
+        datesArray = [stats[i].answersData]
+        statsArray = [stats[i].correctAnswers]
+      } else {
+        console.log(statsArray);
+        datesArray.push(stats[i].answersData)
+        statsArray.push(stats[i].correctAnswers)
+      }
+    }
+
+    let options = {
+      chart: {
+        type: 'bar'
+      },
+      series: [{
+        name: 'quiz',
+        data: statsArray
+      }],
+      xaxis: {
+        categories: datesArray
+      }
+    }
+    
+    chart = new ApexCharts(document.querySelector("#chart"), options);
+    
+    chart.render();
+    console.log(stats);
   } catch (error) {
     console.error(error.message);
   }
@@ -49,12 +80,12 @@ statsFunction()
 function displayQuestion(index) {
     if (index < questions.length) {
         const question = questions[index];
-        questionElement.innerText = question.question;
+        questionElement.innerHTML = `<p>${question.question}</p>`
         const options = question.incorrect_answers.slice();
         options.push(question.correct_answer);
         shuffleArray(options);
         optionsElements.forEach((option, i) => {
-            option.innerText = options[i];
+            option.innerHTML = `<span>${options[i]}</span>`
             option.addEventListener('click', checkAnswer);
         });
         resultElement.innerText = '';
@@ -62,7 +93,7 @@ function displayQuestion(index) {
         // Fin del cuestionario
         imageScore.src = `images/${correctAnswers}-10.jpg`
         questionContainer.classList.add('hide')
-        resultsContainer.classList.remove('hide')
+        // resultsContainer.classList.remove('hide')
         score.innerText = `Respuestas correctas: ${correctAnswers} de 10`;
         nextButton.style.display = 'none';
 
@@ -86,6 +117,8 @@ function displayQuestion(index) {
         currentQuestionIndex = 0
         correctAnswers = 0
         init.classList.add('hide')
+        yourStats.classList.remove('hide')
+        resultsContainer.classList.remove('hide')
         statsFunction()
     }
 }
@@ -104,7 +137,7 @@ function checkAnswer(event) {
             resultElement.classList.remove('alert-success')
             resultElement.innerText = ''
             nextButton.classList.remove('disabled')
-        }, 3000) 
+        }, 2000) 
     } else {
         resultElement.classList.add('alert-danger')
         resultElement.innerText = 'Respuesta incorrecta'; 
@@ -114,7 +147,7 @@ function checkAnswer(event) {
             resultElement.classList.remove('alert-danger')
             resultElement.innerText = ''
             nextButton.classList.remove('disabled')
-        }, 3000) 
+        }, 1000) 
     }
     optionsElements.forEach((option) => option.removeEventListener('click', checkAnswer));
     nextButton.style.display = 'block';
@@ -141,6 +174,7 @@ startBtn.addEventListener('click', ()=>{
     loadQuestions()
     homeContainer.classList.add('hide')
     questionContainer.classList.remove('hide')
+    yourStats.classList.add('hide')
   })
 
 // reiniciar el juego
@@ -152,4 +186,5 @@ tryAgainBtn.addEventListener('click', ()=> {
   resultsContainer.classList.add('hide')
   homeContainer.classList.remove('hide')
   init.classList.remove('hide')
+  chart.remove()
 })
